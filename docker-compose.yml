@@ -1,0 +1,45 @@
+version: '3.8'
+services:
+    app:
+        container_name: 7learn
+        build:
+            context: .
+            dockerfile: Dockerfile
+        networks:
+            - internal
+        command: >
+            sh -c '
+                php artisan migrate &&
+                php artisan serve --host=0.0.0.0
+            '
+        ports:
+            - "8000:8000"
+        volumes:
+            - 7learn_data:/app
+#        restart: always
+        depends_on:
+            - mysql
+
+    mysql:
+        container_name: db
+        image: mysql:latest
+        networks:
+            - internal
+        restart: always
+        environment:
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_USER: ${DB_USERNAME}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+        ports:
+            - "3307:3306"
+        volumes:
+            - db_data:/var/lib/mysql
+
+networks:
+    internal:
+        driver: bridge
+
+volumes:
+    7learn_data:
+    db_data:
