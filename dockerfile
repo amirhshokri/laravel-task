@@ -20,7 +20,7 @@ RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Set the working directory
-WORKDIR /app
+WORKDIR /laravel
 
 # Copy the application files into the container
 COPY . .

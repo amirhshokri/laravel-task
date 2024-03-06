@@ -15,7 +15,7 @@ services:
         ports:
             - "8000:8000"
         volumes:
-            - 7learn_data:/app
+            - ~/projects/7learn:/laravel
 #        restart: always
         depends_on:
             - mysql
@@ -41,5 +41,4 @@ networks:
         driver: bridge
 
 volumes:
-    7learn_data:
     db_data:
