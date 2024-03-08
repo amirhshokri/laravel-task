@@ -11,6 +11,7 @@ services:
             sh -c '
                 #php artisan migrate &&
                 #php artisan db:seed &&
+                #php artisan queue:work &&
                 php artisan serve --host=0.0.0.0
             '
         ports:
