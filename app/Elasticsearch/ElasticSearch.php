@@ -9,6 +9,7 @@ use Elastic\Elasticsearch\ClientBuilder;
 class ElasticSearch
 {
     public \Elastic\Elasticsearch\Client $client;
+    const INDEX_NAME = 'my_index';
 
     public function __construct()
     {
@@ -33,7 +34,7 @@ class ElasticSearch
         foreach ($posts as $post) {
             $params['body'][] = [
                 'index' => [
-                    '_index' => 'my_index',
+                    '_index' => self::INDEX_NAME,
                     '_id' => $post->id,
                 ]
             ];
@@ -64,5 +65,66 @@ class ElasticSearch
             $lastIDSettings->option_value = $offset + $limit;
             $lastIDSettings->save();
         }
+    }
+
+    public function search($page, $perPage): array
+    {
+        $posts = [];
+        $from = ($page - 1) * $perPage;
+
+        $params = [
+            'index' => self::INDEX_NAME,
+            'body' => [
+                'query' => [
+                    'match_all' => new \stdClass(),
+                ],
+                'from' => $from,
+                'size' => $perPage,
+            ]
+        ];
+
+        $response = $this->client->search($params);
+
+        if ($response['hits']['total']['value'] > 0){
+            foreach ($response['hits']['hits'] as $hit) {
+                $posts[] = [
+                    "id" => $hit['_id'],
+                    "title" => $hit['_source']["title"],
+                    "content" => $hit['_source']["content"],
+                ];
+            }
+        }
+
+        return $posts;
+    }
+
+    public function searchByIds(array $ids): array
+    {
+        $posts = [];
+
+        $params = [
+            'index' => self::INDEX_NAME,
+            'body' => [
+                'query' => [
+                    'ids' => [
+                        "values" => $ids
+                    ],
+                ]
+            ]
+        ];
+
+        $response = $this->client->search($params);
+
+        if ($response['hits']['total']['value'] > 0){
+            foreach ($response['hits']['hits'] as $hit) {
+                $posts[] = [
+                    "id" => $hit['_id'],
+                    "title" => $hit['_source']["title"],
+                    "content" => $hit['_source']["content"],
+                ];
+            }
+        }
+
+        return $posts;
     }
 }

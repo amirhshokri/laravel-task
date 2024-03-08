@@ -16,8 +16,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/{version}/posts',
-    function ($version){
-        return app()->make("App\Http\Controllers\API\\$version\\PostController")->index();
+    function (Request $request, $version){
+        return app()->make("App\Http\Controllers\API\\$version\\PostController")->index($request);
     }
 )->middleware('apiVersionControl:PostController,index');
 
